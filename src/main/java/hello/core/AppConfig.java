@@ -9,6 +9,8 @@ import hello.core.member.MemberServiceImpl;
 import hello.core.member.MemoryMemberRepository;
 import hello.core.order.OrderService;
 import hello.core.order.OrderServiceImpl;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 // 애플리케이션의 전체 동작 방식을 구성(config)하기 위해, "구현 객체를 생성"하고, "연결"하는 책임을 가지는 별도의 설정 클래스
 
@@ -22,20 +24,26 @@ import hello.core.order.OrderServiceImpl;
 // AppConfig는 구체 클래스를 선택한다. 배역에 맞는 담당 배우를 선택한다. 애플리케이션이 어떻게 동작해야 할지 전체 구성을 책임진다.
 // 이제 각 배우들은 담당 기능을 실행하는 책임만 지면 된다.
 // MemberServiceImpl, OrderServiceImpl은 기능을 실행하는 책임만 지면 된다.
+
+@Configuration // 애플리케이션의 설정정보라는 스프링규칙, org.springframework~
 public class AppConfig {
     // MemberService 안에 구현체를 new 했었는데 여기서 해줄 것이다.
+    @Bean // 각 메소드에 Bean을 붙이면 스프링컨테이너에 등록됨, Key는 메소드이름 Value는 리턴되는것
     public MemberService memberService() {
         return new MemberServiceImpl(memberRepository());
     }
 
-    private MemberRepository memberRepository() {
+    @Bean
+    public MemberRepository memberRepository() {
         return new MemoryMemberRepository();
     }
 
+    @Bean
     public OrderService orderService() {
         return new OrderServiceImpl(memberRepository(), discountPolicy());
     }
 
+    @Bean
     public DiscountPolicy discountPolicy() {
         return new RateDiscountPolicy();
     }
@@ -83,3 +91,6 @@ public class AppConfig {
 //        영역으로 분리
 //        할인 정책을 변경해도 AppConfig가 있는 구성 영역만 변경하면 됨, 사용 영역은 변경할 필요가 없음. 물론
 //        클라이언트 코드인 주문 서비스 코드도 변경하지 않음
+
+// 210423 23강
+// SRP, DIP, OCP에 대한 내용을 언급중
